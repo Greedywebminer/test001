@@ -1,39 +1,5 @@
 #!/bin/bash
 
-# ANSI color codes for formatting
-NC='\033[0m'     # No Color
-R='\033[0;31m'   # Red
-G='\033[1;32m'   # Light Green
-Y='\033[1;33m'   # Yellow
-LC='\033[1;36m'  # Light Cyan
-LG='\033[1;32m'  # Light Green
-LB='\033[1;34m'  # Light Blue
-P='\033[0;35m'   # Purple
-LP='\033[1;35m'  # Light Purple
-
-# Fancy banner
-echo -e "${LC}#########################################################${NC}"
-echo -e "${LC}#${NC} ${LB}     __________   ________ ________  ________         ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}     \______   \ /  _____/ \_____  \ \______ \        ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}      |       _//   \  ___   _(__  <  |    |  \       ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}      |    |   \\    \_\  \ /       \ |     |   \      ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}      |____|_  / \______  //______  //_______  /      ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}             \/         \/        \/         \/       ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}____   _________________________  ____ ___  _________ ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}\   \ /   /\_   _____/\______   \|    |   \/   _____/ ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB} \   Y   /  |    __)_  |       _/|    |   /\_____  \  ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}  \     /   |        \ |    |   \|    |  / /        \ ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}   \___/   /_______  / |____|_  /|______/ /_______  / ${LC}#${NC}"
-echo -e "${LC}#${NC} ${LB}                   \/         \/                  \/  ${LC}#${NC}"
-echo -e "${LC}#########################################################${NC}"
-echo -e "${LC}#           ${LP}->${NC} ${LG}VERUS CPU CHECK${NC} by Ch3ckr  ${P}<-${NC}            ${LC}#${NC}"
-echo -e "${LC}#########################################################${NC}"
-echo -e "${LC}#${NC}              ${LG}https://api.rg3d.eu:8443${NC}                 ${LC}#${NC}"
-echo -e "${LC}#########################################################${NC}"
-echo  # New line for spacing
-#echo -e "${R}->${NC} ${LC}This process may take a while...${NC}"
-#echo  # New line for spacing
-
 
 # Function to calculate average KHS
 calculate_avg_khs() {
