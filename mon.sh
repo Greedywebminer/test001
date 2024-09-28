@@ -1,19 +1,17 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/bin/bash
+
+SERVER_URL="http://192.168.1.34:5000/data"
+PHONE_ID=$(termux-telephony-deviceinfo | jq -r '.device_id')
 
 while true; do
-  # Get battery status
-  battery=$(termux-battery-status | jq '.')
+    # Get battery status
+    battery=$(termux-battery-status)
+    # Get Wi-Fi status
+    wifi=$(termux-wifi-connectioninfo)
 
-  # Get Wi-Fi status
-  wifi=$(termux-wifi-info 2>&1)
-  if [ $? -ne 0 ]; then
-    wifi="{\"error\": \"Failed to retrieve Wi-Fi info: $wifi\"}"
-  else
-    wifi=$(echo "$wifi" | jq '.')
-  fi
+    # Send data to server
+    curl -X POST -d "phone_id=$PHONE_ID&battery=$battery&wifi=$wifi" $SERVER_URL
 
-  # Save JSON data to a file
-  echo "{\"battery\": $battery, \"wifi\": $wifi}" > /data/data/com.termux/files/home/status.json
-
-  sleep 60  # Wait for 1 minute
+    # Wait 5 minutes before sending again
+    sleep 300
 done
