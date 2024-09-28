@@ -94,7 +94,7 @@ def ensure_termux_apks():
         'termux': 'com.termux_1000.apk',
         'termux_api': 'com.termux.api_51.apk',
         'termux_boot': 'com.termux.boot_1000.apk'
-    }
+  }
     base_url = "https://f-droid.org/repo/"
     
     for apk_name, apk_file in apks.items():
