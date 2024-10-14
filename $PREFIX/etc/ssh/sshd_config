@@ -1,0 +1,4 @@
+PrintMotd yes 
+PasswordAuthentication yes 
+AllowTcpForwarding yes 
+GatewayPorts yes
