@@ -2,8 +2,11 @@
 
 LOG_FILE="/sdcard/adb_wifi_boot.log"
 BOOT_STATUS="/sdcard/termux_boot_status.txt"
-ADB_PC_IP="192.168.202.1"
+
+# ✅ Load PC user and IP (with fallback)
 ADB_PC_USER=$(cat ~/adb_pc_user.txt 2>/dev/null)
+ADB_PC_IP=$(cat ~/adb_pc_ip.txt 2>/dev/null)
+[ -z "$ADB_PC_IP" ] && ADB_PC_IP="192.168.202.1"
 
 echo "$(date): Boot script started" >> "$LOG_FILE"
 
