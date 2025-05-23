@@ -64,7 +64,8 @@ SSH_USER=$(whoami)
 WIFI_IP=$(ip a show wlan0 | awk '/inet / {print $2}' | cut -d/ -f1)
 if [ -n "$WIFI_IP" ]; then
   echo "$SSH_USER@$WIFI_IP" > /sdcard/ssh_info.txt
-  echo "$(date): 🧾 Wrote SSH info: $SSH_USER@$WIFI_IP" >> "$LOG_FILE"
+  echo "$WIFI_IP" > ~/ip.txt
+  echo "$(date): 🧾 Wrote SSH info: $SSH_USER@$WIFI_IP and IP to ~/ip.txt" >> "$LOG_FILE"
 else
   echo "$(date): ❌ Failed to detect Wi-Fi IP. SSH info not written." >> "$LOG_FILE"
 fi
