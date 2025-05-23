@@ -59,15 +59,15 @@ else
   echo "$(date): ⚠️ Missing ~/adb_pc_user.txt. Skipping SSH reconnect." >> "$LOG_FILE"
 fi
 
-# Write actual SSH info for dashboard
+# ✅ Write actual SSH info for dashboard (fixed)
 SSH_USER=$(whoami)
-WIFI_IP=$(ip a show wlan0 | awk '/inet / {print $2}' | cut -d/ -f1)
+WIFI_IP=$(ip route get 1 | awk '{print $7; exit}')
 if [ -n "$WIFI_IP" ]; then
   echo "$SSH_USER@$WIFI_IP" > /sdcard/ssh_info.txt
-  echo "$WIFI_IP" > ~/ip.txt
-  echo "$(date): 🧾 Wrote SSH info: $SSH_USER@$WIFI_IP and IP to ~/ip.txt" >> "$LOG_FILE"
+  echo "$WIFI_IP" > /sdcard/ip.txt
+  echo "$(date): 🧾 Wrote SSH info: $SSH_USER@$WIFI_IP and IP to /sdcard/ip.txt" >> "$LOG_FILE"
 else
-  echo "$(date): ❌ Failed to detect Wi-Fi IP. SSH info not written." >> "$LOG_FILE"
+  echo "$(date): ❌ Failed to detect IP. SSH info not written." >> "$LOG_FILE"
 fi
 
 # Mark boot completed
