@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/data/data/com.termux/files/usr/bin/env bash
 
 LOG_FILE="/sdcard/adb_wifi_boot.log"
 BOOT_STATUS="/sdcard/termux_boot_status.txt"
@@ -21,18 +21,26 @@ done
 
 # Start wake lock + SSH
 termux-wake-lock
-sshd
-echo "$(date): SSH started." >> "$LOG_FILE"
+sshd && echo "$(date): SSH started." >> "$LOG_FILE"
 
 # Launch miner
 cd ~/ccminer
-./start.sh &
+./start.sh >> /sdcard/miner_boot.log 2>&1 &
 echo "$(date): Miner launched." >> "$LOG_FILE"
+
+# 🔁 Establish persistent SSH tunnel to PC using autossh
+if command -v autossh >/dev/null 2>&1; then
+  echo "$(date): Starting autossh to maintain reverse tunnel." >> "$LOG_FILE"
+  autossh -M 0 -f -N -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" \
+    -R 2222:localhost:8022 "$ADB_PC_USER@$ADB_PC_IP" >> "$LOG_FILE" 2>&1
+  echo "$(date): autossh started (reverse tunnel on port 2222)." >> "$LOG_FILE"
+else
+  echo "$(date): ❌ autossh not installed. Persistent tunnel skipped." >> "$LOG_FILE"
+fi
 
 # ADB reconnect via SSH to PC
 if [ -n "$ADB_PC_USER" ]; then
   echo "$(date): Trying SSH to $ADB_PC_USER@$ADB_PC_IP to run 'adb tcpip 5555'" >> "$LOG_FILE"
-
   success=false
   for i in 1 2 3; do
     if ping -c 1 "$ADB_PC_IP" > /dev/null 2>&1; then
@@ -59,9 +67,9 @@ else
   echo "$(date): ⚠️ Missing ~/adb_pc_user.txt. Skipping SSH reconnect." >> "$LOG_FILE"
 fi
 
-# ✅ Write actual SSH info for dashboard (fixed)
+# ✅ Write actual SSH info for dashboard
 SSH_USER=$(whoami)
-WIFI_IP=$(ip route get 1 | awk '{print $7; exit}')
+WIFI_IP=$(ip a | grep wlan0 | grep inet | awk '{print $2}' | cut -d/ -f1 | head -n1)
 if [ -n "$WIFI_IP" ]; then
   echo "$SSH_USER@$WIFI_IP" > /sdcard/ssh_info.txt
   echo "$WIFI_IP" > /sdcard/ip.txt
