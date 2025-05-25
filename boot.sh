@@ -1,12 +1,9 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 
 LOG_FILE="/sdcard/adb_wifi_boot.log"
 BOOT_STATUS="/sdcard/termux_boot_status.txt"
-
-# ✅ Load PC user and IP (with fallback)
+ADB_PC_IP="192.168.202.1"
 ADB_PC_USER=$(cat ~/adb_pc_user.txt 2>/dev/null)
-ADB_PC_IP=$(cat ~/adb_pc_ip.txt 2>/dev/null)
-[ -z "$ADB_PC_IP" ] && ADB_PC_IP="192.168.202.1"
 
 echo "$(date): Boot script started" >> "$LOG_FILE"
 
@@ -21,26 +18,18 @@ done
 
 # Start wake lock + SSH
 termux-wake-lock
-sshd && echo "$(date): SSH started." >> "$LOG_FILE"
+sshd
+echo "$(date): SSH started." >> "$LOG_FILE"
 
 # Launch miner
 cd ~/ccminer
-./start.sh >> /sdcard/miner_boot.log 2>&1 &
+./start.sh &
 echo "$(date): Miner launched." >> "$LOG_FILE"
-
-# 🔁 Establish persistent SSH tunnel to PC using autossh
-if command -v autossh >/dev/null 2>&1; then
-  echo "$(date): Starting autossh to maintain reverse tunnel." >> "$LOG_FILE"
-  autossh -M 0 -f -N -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" \
-    -R 2222:localhost:8022 "$ADB_PC_USER@$ADB_PC_IP" >> "$LOG_FILE" 2>&1
-  echo "$(date): autossh started (reverse tunnel on port 2222)." >> "$LOG_FILE"
-else
-  echo "$(date): ❌ autossh not installed. Persistent tunnel skipped." >> "$LOG_FILE"
-fi
 
 # ADB reconnect via SSH to PC
 if [ -n "$ADB_PC_USER" ]; then
   echo "$(date): Trying SSH to $ADB_PC_USER@$ADB_PC_IP to run 'adb tcpip 5555'" >> "$LOG_FILE"
+
   success=false
   for i in 1 2 3; do
     if ping -c 1 "$ADB_PC_IP" > /dev/null 2>&1; then
@@ -65,17 +54,6 @@ if [ -n "$ADB_PC_USER" ]; then
   fi
 else
   echo "$(date): ⚠️ Missing ~/adb_pc_user.txt. Skipping SSH reconnect." >> "$LOG_FILE"
-fi
-
-# ✅ Write actual SSH info for dashboard
-SSH_USER=$(whoami)
-WIFI_IP=$(ip a | grep wlan0 | grep inet | awk '{print $2}' | cut -d/ -f1 | head -n1)
-if [ -n "$WIFI_IP" ]; then
-  echo "$SSH_USER@$WIFI_IP" > /sdcard/ssh_info.txt
-  echo "$WIFI_IP" > /sdcard/ip.txt
-  echo "$(date): 🧾 Wrote SSH info: $SSH_USER@$WIFI_IP and IP to /sdcard/ip.txt" >> "$LOG_FILE"
-else
-  echo "$(date): ❌ Failed to detect IP. SSH info not written." >> "$LOG_FILE"
 fi
 
 # Mark boot completed
